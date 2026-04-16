@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 import numpy as np
 import pandas as pd
 import sys
@@ -55,10 +55,10 @@ class ModelInfoResponse(BaseModel):
     target: str
 
 class ModelMetricsResponse(BaseModel):
-    model_comparison: List[Dict[str, float]]
+    model_comparison: List[Dict[str, Union[float, str]]]
 
 class FeatureImportanceResponse(BaseModel):
-    features: List[Dict[str, float]]
+    features: List[Dict[str, Union[float, str]]]
 
 @app.on_event("startup")
 async def startup_event():
