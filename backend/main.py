@@ -95,7 +95,25 @@ async def startup_event():
             sample_data[:, 24] = np.random.normal(1600, 350, n_samples) # 6back_mean
             
             features_df = pd.DataFrame(sample_data, columns=feature_names)
-            features_df['fatigue_level'] = np.random.choice([0, 1], n_samples, p=[0.5, 0.5])
+            # Create realistic fatigue labels based on response times
+            # Slower response times = higher fatigue
+            fatigue_scores = []
+            for i in range(n_samples):
+                # Extract response time means (columns 0, 8, 16, 24)
+                response_means = [sample_data[i, 0], sample_data[i, 8], sample_data[i, 16], sample_data[i, 24]]
+                avg_response_time = np.mean(response_means)
+                
+                # Assign fatigue based on response time (slower = more fatigued)
+                if avg_response_time < 1200:  # Fast responses = low fatigue
+                    fatigue_level = 0
+                elif avg_response_time < 1600:  # Medium responses = moderate fatigue
+                    fatigue_level = np.random.choice([0, 1], p=[0.7, 0.3])  # 70% chance low fatigue
+                else:  # Slow responses = high fatigue
+                    fatigue_level = 1
+                    
+                fatigue_scores.append(fatigue_level)
+            
+            features_df['fatigue_level'] = fatigue_scores
             print(f"Created sample data with {n_samples} samples and {n_features} features")
         
         # Initialize predictor
